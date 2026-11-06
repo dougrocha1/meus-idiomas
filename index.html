@@ -460,12 +460,7 @@
 
         .practice-feedback-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent !important;
-            backdrop-filter: none !important;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -474,14 +469,7 @@
             padding: 20px;
             box-sizing: border-box;
             pointer-events: none;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease, visibility 0.2s ease;
-        }
-        .practice-feedback-overlay:not(.hidden) {
-            pointer-events: auto;
-            opacity: 1;
-            visibility: visible;
+            background: transparent;
         }
         .practice-feedback-overlay.hidden {
             display: none !important;
@@ -595,7 +583,6 @@
         #practiceFeedback {
             font-size: 3.5rem;
             position: relative;
-            z-index: 5001;
             flex: 0 0 auto;
             width: 100%;
             margin: 8px 0 12px;
@@ -614,6 +601,9 @@
             justify-content: center;
             text-align: center;
             text-shadow: 0 0 10px rgba(0, 255, 85, 0.3);
+        }
+        #practiceFeedback:empty {
+            display: none;
         }
         .correct-answer-card {
             width: 100%;
@@ -762,10 +752,12 @@
                     </div>
 
                     <p id="practiceNotes" style="color: #94a3b8; margin-bottom: 12px; font-style: italic;"></p>
-                    <p id="practiceFeedback"></p>
                 </div>
                 <div class="practice-footer">
                     <button id="practiceQuitBtn" class="btn secondary" style="margin-top: 10px; width: 90%;" data-i18n="quitPractice">Sair do Treino</button>
+                </div>
+                <div class="practice-feedback-overlay">
+                    <p id="practiceFeedback"></p>
                 </div>
             </div>
         </section>
