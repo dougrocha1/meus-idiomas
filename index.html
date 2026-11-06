@@ -460,7 +460,10 @@
 
         .practice-feedback-overlay {
             position: absolute;
-            inset: 0;
+            top: var(--practice-feedback-top, 0px);
+            right: 0;
+            bottom: var(--practice-feedback-bottom, 0px);
+            left: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -585,7 +588,7 @@
             position: relative;
             flex: 0 0 auto;
             width: 100%;
-            margin: 8px 0 12px;
+            margin: 0;
             padding: 8px;
             border-radius: 14px;
             border: none !important;
@@ -629,7 +632,7 @@
             width: 100%;
             height: auto;
             display: block;
-            margin: 10px auto 0 auto;
+            margin: 0 auto;
             border-radius: 14px;
             position: relative;
             z-index: 1;
@@ -645,19 +648,19 @@
 
         .keyboard-open .feedback-image {
             max-width: 160px !important;
-            margin: 6px auto !important;
+            margin: 0 auto !important;
         }
         .keyboard-open .feedback-image.xl {
             max-width: 180px !important;
-            margin: 6px auto !important;
+            margin: 0 auto !important;
         }
         .keyboard-open .feedback-image.large {
             max-width: 180px !important;
-            margin: 6px auto !important;
+            margin: 0 auto !important;
         }
         .keyboard-open #practiceFeedback {
             min-height: 110px !important;
-            margin: 6px 0 10px !important;
+            margin: 0 !important;
             padding: 6px !important;
         }
 
@@ -1331,7 +1334,27 @@ document.addEventListener('click', () => {
             const listEl = document.getElementById('notebookList');
             const modal = document.getElementById('modalOverlay');
             const practiceInput = document.getElementById('practiceInput');
+            const practiceContainer = practiceView.querySelector('.practice-container');
+            const practiceFeedbackOverlay = practiceView.querySelector('.practice-feedback-overlay');
+            const practiceQuitButton = document.getElementById('practiceQuitBtn');
             const practiceVisualViewport = window.visualViewport;
+
+            function updatePracticeFeedbackPosition() {
+                const containerRect = practiceContainer.getBoundingClientRect();
+                const inputRect = practiceInput.getBoundingClientRect();
+                const quitRect = practiceQuitButton.getBoundingClientRect();
+                const borderTop = practiceContainer.clientTop;
+                const borderBottom = practiceContainer.offsetHeight - practiceContainer.clientHeight - borderTop;
+
+                practiceFeedbackOverlay.style.setProperty(
+                    '--practice-feedback-top',
+                    `${Math.max(0, inputRect.bottom - containerRect.top - borderTop)}px`
+                );
+                practiceFeedbackOverlay.style.setProperty(
+                    '--practice-feedback-bottom',
+                    `${Math.max(0, containerRect.bottom - quitRect.top - borderBottom)}px`
+                );
+            }
 
             function updatePracticeKeyboardLayout() {
                 if (isTransitioning) return;
@@ -1355,7 +1378,15 @@ document.addEventListener('click', () => {
                     practiceView.style.removeProperty('--visual-viewport-width');
                     practiceView.style.removeProperty('--visual-viewport-center-x');
                 }
+                updatePracticeFeedbackPosition();
             }
+
+            const practiceFeedbackResizeObserver = new ResizeObserver(updatePracticeFeedbackPosition);
+            practiceFeedbackResizeObserver.observe(practiceContainer);
+            practiceFeedbackResizeObserver.observe(practiceInput);
+            practiceFeedbackResizeObserver.observe(practiceQuitButton);
+            practiceFeedbackResizeObserver.observe(practiceView.querySelector('.practice-word-wrapper'));
+            practiceFeedbackResizeObserver.observe(document.getElementById('practiceNotes'));
 
             practiceInput.addEventListener('focus', updatePracticeKeyboardLayout);
             practiceInput.addEventListener('blur', updatePracticeKeyboardLayout);
@@ -1757,6 +1788,7 @@ document.addEventListener('click', () => {
             function resizePracticeInput() {
                 practiceInput.style.height = 'auto';
                 practiceInput.style.height = `${practiceInput.scrollHeight + practiceInput.offsetHeight - practiceInput.clientHeight}px`;
+                updatePracticeFeedbackPosition();
             }
 
                 // Função para lidar com sucesso na resposta//
