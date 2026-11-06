@@ -457,6 +457,11 @@
             align-items: center;
             position: relative;
         }
+        .practice-container.answer-revealed {
+            height: auto;
+            max-height: none;
+            overflow: visible;
+        }
 
         .practice-feedback-overlay {
             position: absolute;
@@ -476,6 +481,14 @@
         }
         .practice-feedback-overlay.hidden {
             display: none !important;
+        }
+        .practice-container.answer-revealed .practice-feedback-overlay {
+            position: relative;
+            inset: auto;
+            flex: 0 0 auto;
+            width: 100%;
+            padding: 8px 0;
+            z-index: auto;
         }
         .app-container > #practiceSection {
             width: calc(100% + 12px);
@@ -607,6 +620,10 @@
         }
         #practiceFeedback:empty {
             display: none;
+        }
+        .practice-container.answer-revealed #practiceFeedback {
+            min-height: 0;
+            padding: 0;
         }
         .correct-answer-card {
             width: 100%;
@@ -756,11 +773,11 @@
 
                     <p id="practiceNotes" style="color: #94a3b8; margin-bottom: 12px; font-style: italic;"></p>
                 </div>
-                <div class="practice-footer">
-                    <button id="practiceQuitBtn" class="btn secondary" style="margin-top: 10px; width: 90%;" data-i18n="quitPractice">Sair do Treino</button>
-                </div>
                 <div class="practice-feedback-overlay">
                     <p id="practiceFeedback"></p>
+                </div>
+                <div class="practice-footer">
+                    <button id="practiceQuitBtn" class="btn secondary" style="margin-top: 10px; width: 90%;" data-i18n="quitPractice">Sair do Treino</button>
                 </div>
             </div>
         </section>
@@ -1357,7 +1374,7 @@ document.addEventListener('click', () => {
             }
 
             function updatePracticeKeyboardLayout() {
-                if (isTransitioning) return;
+                if (isTransitioning && document.activeElement === practiceInput) return;
                 const keyboardOpen = document.activeElement === practiceInput
                     && window.innerWidth <= 767
                     && practiceVisualViewport
@@ -1379,6 +1396,40 @@ document.addEventListener('click', () => {
                     practiceView.style.removeProperty('--visual-viewport-center-x');
                 }
                 updatePracticeFeedbackPosition();
+            }
+
+            function waitForPracticeKeyboardToClose() {
+                if (!practiceView.classList.contains('keyboard-open') || !practiceVisualViewport) {
+                    return Promise.resolve();
+                }
+
+                return new Promise(resolve => {
+                    let timeoutId;
+                    let isResolved = false;
+
+                    const cleanup = () => {
+                        practiceVisualViewport.removeEventListener('resize', checkKeyboardClosed);
+                        window.removeEventListener('resize', checkKeyboardClosed);
+                        clearTimeout(timeoutId);
+                    };
+                    const finish = () => {
+                        if (isResolved) return;
+                        isResolved = true;
+                        cleanup();
+                        resolve();
+                    };
+                    const checkKeyboardClosed = () => {
+                        if (practiceVisualViewport.height >= window.innerHeight - 100) {
+                            finish();
+                        }
+                    };
+
+                    practiceVisualViewport.addEventListener('resize', checkKeyboardClosed);
+                    window.addEventListener('resize', checkKeyboardClosed);
+                    timeoutId = setTimeout(finish, 2000);
+                    practiceInput.blur();
+                    checkKeyboardClosed();
+                });
             }
 
             const practiceFeedbackResizeObserver = new ResizeObserver(updatePracticeFeedbackPosition);
@@ -1764,6 +1815,7 @@ document.addEventListener('click', () => {
 
             function nextStep() {
                 isTransitioning = false;
+                practiceContainer.classList.remove('answer-revealed');
                 const w = activePracticeWords[pIndex];
                 document.getElementById('practiceNative').textContent = w.native;
                 practiceInput.value = '';
@@ -1848,22 +1900,25 @@ document.addEventListener('click', () => {
                     const answerCard = document.createElement('div');
                     answerCard.className = 'correct-answer-card';
                     answerCard.textContent = currentTranslation;
-                    feedback.replaceChildren(answerCard);
-                    setTimeout(() => {
-                        feedback.innerHTML = `<img src="imgApp/gameOver.png" alt="Game Over" class="feedback-image large">`;
-                        playGameOverSound();
-
+                    waitForPracticeKeyboardToClose().then(() => {
+                        practiceContainer.classList.add('answer-revealed');
+                        feedback.replaceChildren(answerCard);
                         setTimeout(() => {
-                            practiceView.classList.add('hidden');
-                            if (practiceSource === 'detail') {
-                                detailView.classList.remove('hidden');
-                                renderWords();
-                            } else {
-                                mainView.classList.remove('hidden');
-                                renderNotebooks();
-                            }
+                            feedback.innerHTML = `<img src="imgApp/gameOver.png" alt="Game Over" class="feedback-image large">`;
+                            playGameOverSound();
+
+                            setTimeout(() => {
+                                practiceView.classList.add('hidden');
+                                if (practiceSource === 'detail') {
+                                    detailView.classList.remove('hidden');
+                                    renderWords();
+                                } else {
+                                    mainView.classList.remove('hidden');
+                                    renderNotebooks();
+                                }
+                            }, 4000);
                         }, 4000);
-                    }, 4000);
+                    });
                 } else {
                     feedback.textContent = '❌';
                     practiceInput.value = '';
