@@ -446,7 +446,7 @@
 
         .practice-container {
             background: #111827;
-            padding: 24px 16px;
+            padding: 32px 16px 24px;
             border-radius: 24px;
             text-align: center;
             border: 3px solid #00ff55;
@@ -545,11 +545,12 @@
             transform: translateX(-50%);
         }
         .keyboard-open .practice-container {
+            box-sizing: border-box;
             width: 100%;
             height: 100%;
             max-height: 100%;
             overflow: hidden;
-            padding-bottom: 12px;
+            padding: 32px 16px 12px;
         }
         .practice-scroll-content {
             width: 100%;
@@ -588,9 +589,16 @@
             left: 4px;
             transform: translateY(-50%);
             flex-direction: column;
-            gap: 5px;
+            justify-content: center;
+            gap: 7px;
             z-index: 1;
             pointer-events: none;
+        }
+        .practice-status-row {
+            position: relative;
+            width: 100%;
+            min-height: 72px;
+            flex: 0 0 72px;
         }
         #practiceTopFeedback {
             position: absolute;
@@ -795,7 +803,7 @@
             <div class="practice-container">
                 <div class="practice-scroll-content">
                     <div class="practice-word-wrapper" style="display:flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; margin-bottom: 24px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-inline: 4px; position: relative;">
+                        <div class="practice-status-row" style="display: flex; align-items: center; justify-content: space-between; padding-inline: 4px;">
                             <p id="practiceAttempts" style="color: #f87171; font-weight: bold; margin: 0;"></p>
                             <button id="practiceAudioBtn" class="audio-btn" data-i18n-title="listenPronunciation" title="Ouvir pronúncia" style="padding: 10px; font-size: 1.2rem; position: absolute; left: 50%; transform: translateX(-50%);">🔊</button>
                             <div id="practiceTopFeedback" style="width: 64px; height: 64px; display: flex; align-items: flex-end; justify-content: flex-end; padding-bottom: 4px; box-sizing: border-box;"></div>
