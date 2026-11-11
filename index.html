@@ -457,18 +457,52 @@
             align-items: center;
             position: relative;
         }
-        .practice-container.answer-revealed {
-            height: auto;
-            max-height: none;
-            overflow: visible;
+
+        .practice-result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .practice-result-modal.hidden {
+            display: none !important;
+        }
+        .practice-result-content {
+            background: #0d1220;
+            border: 3px solid #00ff55;
+            color: #f1f5f9;
+            padding: 24px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 25px rgba(0, 255, 85, 0.25);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
         }
 
         .practice-feedback-overlay {
             position: absolute;
-            top: var(--practice-feedback-top, 0px);
-            right: 0;
-            bottom: var(--practice-feedback-bottom, 0px);
+            top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent !important;
+            backdrop-filter: none !important;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -477,18 +511,17 @@
             padding: 20px;
             box-sizing: border-box;
             pointer-events: none;
-            background: transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+        .practice-feedback-overlay:not(.hidden) {
+            pointer-events: auto;
+            opacity: 1;
+            visibility: visible;
         }
         .practice-feedback-overlay.hidden {
             display: none !important;
-        }
-        .practice-container.answer-revealed .practice-feedback-overlay {
-            position: relative;
-            inset: auto;
-            flex: 0 0 auto;
-            width: 100%;
-            padding: 8px 0;
-            z-index: auto;
         }
         .app-container > #practiceSection {
             width: calc(100% + 12px);
@@ -545,13 +578,10 @@
             margin-bottom: 0;
         }
         .keyboard-open #practiceQuitBtn {
-            margin-top: 12px !important;
+            margin-top: 8px !important;
 
 
 
-        }
-        #practiceQuitBtn {
-            margin-top: 14px !important;
         }
 
         .practice-word-wrapper {
@@ -595,53 +625,41 @@
             flex-shrink: 0;
         }
 
-        /* Mantém o feedback centralizado entre o campo e o botão de saída. */
+        /* Reduzido o tamanho da fonte e altura mínima da área de feedback */
         #practiceFeedback {
             font-size: 3.5rem;
-            position: relative;
-            flex: 0 0 auto;
-            width: 100%;
             margin: 0;
-            padding: 8px;
-            border-radius: 14px;
+            padding: 20px;
+            border-radius: 0;
             border: none !important;
             background: transparent !important;
             backdrop-filter: none !important;
             box-shadow: none !important;
-            max-width: 100%;
-            min-width: 0;
+            max-width: 90%;
+            min-width: 180px;
             min-height: 130px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center;
             text-shadow: 0 0 10px rgba(0, 255, 85, 0.3);
-        }
-        #practiceFeedback:empty {
-            display: none;
-        }
-        .practice-container.answer-revealed #practiceFeedback {
-            min-height: 0;
-            padding: 0;
         }
         .correct-answer-card {
             width: 100%;
-            max-width: 370px;
+            max-width: 100%;
             min-width: 0;
             padding: 16px 20px;
-            border: 2px solid #00ff55;
-            border-radius: 14px;
-            background: rgba(15, 23, 42, 0.92);
+            border: none !important;
+            border-radius: 0;
+            background: transparent !important;
             backdrop-filter: none !important;
             color: #00ff55;
             font-size: 2.35rem;
             line-height: 1.45;
             overflow-wrap: anywhere;
             word-break: break-word;
-            text-align: center;
             text-shadow: 0 0 10px rgba(0,0,0,0.8);
-            box-shadow: 0 0 15px rgba(21, 182, 75, 0.35);
+            box-shadow: none !important;
         }
 
         .feedback-image {
@@ -649,10 +667,8 @@
             width: 100%;
             height: auto;
             display: block;
-            margin: 0 auto;
+            margin: 10px auto 0 auto;
             border-radius: 14px;
-            position: relative;
-            z-index: 1;
         }
 
         .feedback-image.large {
@@ -664,21 +680,20 @@
         }
 
         .keyboard-open .feedback-image {
-            max-width: 160px !important;
-            margin: 0 auto !important;
+            max-width: 110px !important;
+            margin: 4px auto !important;
         }
         .keyboard-open .feedback-image.xl {
-            max-width: 180px !important;
-            margin: 0 auto !important;
+            max-width: 130px !important;
+            margin: 4px auto !important;
         }
         .keyboard-open .feedback-image.large {
-            max-width: 180px !important;
-            margin: 0 auto !important;
+            max-width: 150px !important;
+            margin: 4px auto !important;
         }
         .keyboard-open #practiceFeedback {
-            min-height: 110px !important;
-            margin: 0 !important;
-            padding: 6px !important;
+            min-height: 70px !important;
+            margin: 5px 0 !important;
         }
 
         .empty-state {
@@ -759,22 +774,27 @@
             <div class="practice-container">
                 <div class="practice-scroll-content">
                     <div class="practice-word-wrapper" style="display:flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-inline: 8px;">
-                            <div style="width: 44px;"></div>
-                            <button id="practiceAudioBtn" class="audio-btn" data-i18n-title="listenPronunciation" title="Ouvir pronúncia" style="padding: 10px; font-size: 1.2rem;">🔊</button>
-                            <p id="practiceAttempts" style="color: #f87171; font-weight: bold; margin: 0; width: 44px; text-align: right;"></p>
+                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-inline: 4px; position: relative;">
+                            <p id="practiceAttempts" style="color: #f87171; font-weight: bold; margin: 0;"></p>
+                            <button id="practiceAudioBtn" class="audio-btn" data-i18n-title="listenPronunciation" title="Ouvir pronúncia" style="padding: 10px; font-size: 1.2rem; position: absolute; left: 50%; transform: translateX(-50%);">🔊</button>
+                            <div id="practiceTopFeedback" style="width: 64px; height: 48px; display: flex; align-items: center; justify-content: flex-end;"></div>
                         </div>
                         <h2 id="practiceNative" style="font-size: 1.8rem; color: #f9f9f9; text-align: center;"></h2>
                     </div>
 
-                    <div class="practice-input-group" style="margin-bottom: 12px;">
-                        <textarea id="practiceInput" rows="1" data-i18n-placeholder="yourTranslation" placeholder="Sua tradução..." autocomplete="off" style="padding: 16px; border-radius: 16px; border: 2px solid #334155; background: #0f172a; color: white; text-align: center; width:90%; resize: none; overflow-y: hidden;"></textarea>
+                    <!-- CONTAINER DE RESULTADO INLINE -->
+                    <div id="practiceInlineResultContainer" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 16px 8px;">
+                        <div id="practiceInlineResultBody" style="width: 100%; text-align: center;"></div>
+                        <button id="practiceInlineResultCloseBtn" class="btn primary" style="width: 90%; max-width: 300px; padding: 14px; font-size: 1.1rem;" data-i18n="confirm">OK / Continuar</button>
                     </div>
 
-                    <p id="practiceNotes" style="color: #94a3b8; margin-bottom: 12px; font-style: italic;"></p>
-                </div>
-                <div class="practice-feedback-overlay">
-                    <p id="practiceFeedback"></p>
+                    <div id="practiceNormalFields" style="width: 100%;">
+                        <div class="practice-input-group" style="margin-bottom: 12px;">
+                            <textarea id="practiceInput" rows="1" data-i18n-placeholder="yourTranslation" placeholder="Sua tradução..." autocomplete="off" style="padding: 16px; border-radius: 16px; border: 2px solid #334155; background: #0f172a; color: white; text-align: center; width:90%; resize: none; overflow-y: hidden;"></textarea>
+                        </div>
+
+                        <p id="practiceNotes" style="color: #94a3b8; margin-bottom: 12px; font-style: italic;"></p>
+                    </div>
                 </div>
                 <div class="practice-footer">
                     <button id="practiceQuitBtn" class="btn secondary" style="margin-top: 10px; width: 90%;" data-i18n="quitPractice">Sair do Treino</button>
@@ -805,6 +825,14 @@
                 <button id="miniEditBtn" class="btn primary" style="width: 100%; padding: 12px; font-size: 1rem;">✏️ <span data-i18n="edit">Editar</span></button>
                 <button id="miniDelBtn" class="btn danger" style="width: 100%; padding: 12px; font-size: 1rem;">🗑️ <span data-i18n="delete">Excluir</span></button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE RESULTADO DE TREINO (GAME OVER / GOOD JOB / RESPOSTA CERTA) -->
+    <div id="practiceResultModal" class="practice-result-modal hidden">
+        <div class="practice-result-content">
+            <div id="practiceResultBody" style="width: 100%;"></div>
+            <button id="practiceResultCloseBtn" class="btn primary" style="width: 100%; margin-top: 10px;" data-i18n="confirm">OK / Continuar</button>
         </div>
     </div>
 
@@ -1182,7 +1210,8 @@
                 savedNotebooks = JSON.parse(localStorage.getItem('meus-cadernos'));
             } catch (e) {}
 
-            let notebooks = (Array.isArray(savedNotebooks) && savedNotebooks.length > 0) ? savedNotebooks : [
+            const hasValidNotebooks = Array.isArray(savedNotebooks) && savedNotebooks.some(nb => nb && Array.isArray(nb.words) && nb.words.length > 0);
+            let notebooks = hasValidNotebooks ? savedNotebooks : [
                 {
                     title: "Inglês Básico",
                     lang: "en-US",
@@ -1351,30 +1380,10 @@ document.addEventListener('click', () => {
             const listEl = document.getElementById('notebookList');
             const modal = document.getElementById('modalOverlay');
             const practiceInput = document.getElementById('practiceInput');
-            const practiceContainer = practiceView.querySelector('.practice-container');
-            const practiceFeedbackOverlay = practiceView.querySelector('.practice-feedback-overlay');
-            const practiceQuitButton = document.getElementById('practiceQuitBtn');
             const practiceVisualViewport = window.visualViewport;
 
-            function updatePracticeFeedbackPosition() {
-                const containerRect = practiceContainer.getBoundingClientRect();
-                const inputRect = practiceInput.getBoundingClientRect();
-                const quitRect = practiceQuitButton.getBoundingClientRect();
-                const borderTop = practiceContainer.clientTop;
-                const borderBottom = practiceContainer.offsetHeight - practiceContainer.clientHeight - borderTop;
-
-                practiceFeedbackOverlay.style.setProperty(
-                    '--practice-feedback-top',
-                    `${Math.max(0, inputRect.bottom - containerRect.top - borderTop)}px`
-                );
-                practiceFeedbackOverlay.style.setProperty(
-                    '--practice-feedback-bottom',
-                    `${Math.max(0, containerRect.bottom - quitRect.top - borderBottom)}px`
-                );
-            }
-
             function updatePracticeKeyboardLayout() {
-                if (isTransitioning && document.activeElement === practiceInput) return;
+                if (isTransitioning) return;
                 const keyboardOpen = document.activeElement === practiceInput
                     && window.innerWidth <= 767
                     && practiceVisualViewport
@@ -1395,49 +1404,7 @@ document.addEventListener('click', () => {
                     practiceView.style.removeProperty('--visual-viewport-width');
                     practiceView.style.removeProperty('--visual-viewport-center-x');
                 }
-                updatePracticeFeedbackPosition();
             }
-
-            function waitForPracticeKeyboardToClose() {
-                if (!practiceView.classList.contains('keyboard-open') || !practiceVisualViewport) {
-                    return Promise.resolve();
-                }
-
-                return new Promise(resolve => {
-                    let timeoutId;
-                    let isResolved = false;
-
-                    const cleanup = () => {
-                        practiceVisualViewport.removeEventListener('resize', checkKeyboardClosed);
-                        window.removeEventListener('resize', checkKeyboardClosed);
-                        clearTimeout(timeoutId);
-                    };
-                    const finish = () => {
-                        if (isResolved) return;
-                        isResolved = true;
-                        cleanup();
-                        resolve();
-                    };
-                    const checkKeyboardClosed = () => {
-                        if (practiceVisualViewport.height >= window.innerHeight - 100) {
-                            finish();
-                        }
-                    };
-
-                    practiceVisualViewport.addEventListener('resize', checkKeyboardClosed);
-                    window.addEventListener('resize', checkKeyboardClosed);
-                    timeoutId = setTimeout(finish, 2000);
-                    practiceInput.blur();
-                    checkKeyboardClosed();
-                });
-            }
-
-            const practiceFeedbackResizeObserver = new ResizeObserver(updatePracticeFeedbackPosition);
-            practiceFeedbackResizeObserver.observe(practiceContainer);
-            practiceFeedbackResizeObserver.observe(practiceInput);
-            practiceFeedbackResizeObserver.observe(practiceQuitButton);
-            practiceFeedbackResizeObserver.observe(practiceView.querySelector('.practice-word-wrapper'));
-            practiceFeedbackResizeObserver.observe(document.getElementById('practiceNotes'));
 
             practiceInput.addEventListener('focus', updatePracticeKeyboardLayout);
             practiceInput.addEventListener('blur', updatePracticeKeyboardLayout);
@@ -1813,15 +1780,26 @@ document.addEventListener('click', () => {
                 nextStep();
             };
 
+            let successTimeout = null;
+            let failureResultTimeout = null;
+
             function nextStep() {
                 isTransitioning = false;
-                practiceContainer.classList.remove('answer-revealed');
+                if (successTimeout) {
+                    clearTimeout(successTimeout);
+                    successTimeout = null;
+                }
                 const w = activePracticeWords[pIndex];
                 document.getElementById('practiceNative').textContent = w.native;
                 practiceInput.value = '';
                 practiceInput.style.height = 'auto';
                 resizePracticeInput();
-                document.getElementById('practiceFeedback').textContent = '';
+                const topFeedback = document.getElementById('practiceTopFeedback');
+                if (topFeedback) topFeedback.innerHTML = '';
+                const inlineModal = document.getElementById('practiceInlineResultContainer');
+                const normalFields = document.getElementById('practiceNormalFields');
+                if (inlineModal) inlineModal.classList.add('hidden');
+                if (normalFields) normalFields.classList.remove('hidden');
                 practiceInput.disabled = false;
                 practiceInput.focus();
 
@@ -1840,18 +1818,22 @@ document.addEventListener('click', () => {
             function resizePracticeInput() {
                 practiceInput.style.height = 'auto';
                 practiceInput.style.height = `${practiceInput.scrollHeight + practiceInput.offsetHeight - practiceInput.clientHeight}px`;
-                updatePracticeFeedbackPosition();
             }
 
                 // Função para lidar com sucesso na resposta//
             function triggerSuccess() {
                 isTransitioning = true;
+                if (successTimeout) {
+                    clearTimeout(successTimeout);
+                    successTimeout = null;
+                }
 
-                // Pequena pausa de 0.8s para o usuário ver a palavra digitada completa na tela
-                setTimeout(() => {
-                    const feedback = document.getElementById('practiceFeedback');
-                    feedback.textContent = '';
-                    feedback.innerHTML = `<img src="imgApp/joia.png" alt="${t('correct')}" class="feedback-image">`;
+                // Pequena pausa de 1.2s para o usuário ver a palavra digitada completa na tela
+                successTimeout = setTimeout(() => {
+                    const topFeedback = document.getElementById('practiceTopFeedback');
+                    if (topFeedback) {
+                        topFeedback.innerHTML = `<img src="imgApp/joia.png" alt="${t('correct')}" style="width: 56px; height: auto; border-radius: 6px; animation: popIn 0.2s ease;">`;
+                    }
                     playCoinSound();
                     correctAnswers++;
 
@@ -1878,8 +1860,8 @@ document.addEventListener('click', () => {
                     // Mantém o texto digitado visível junto com o "joia.png" e focado para a próxima palavra
                     practiceInput.focus();
 
-                    // Aguarda os 3.5 segundos (successImageMs + successAdvanceMs) exibindo "joia.png" antes de pular
-                    setTimeout(() => {
+                    // Aguarda os segundos exibindo "joia.png" antes de pular
+                    successTimeout = setTimeout(() => {
                         advance();
                     }, successImageMs + successAdvanceMs);
 
@@ -1888,7 +1870,6 @@ document.addEventListener('click', () => {
                // Função para lidar com falha na resposta//
             function triggerFailure() {
                 isTransitioning = true;
-                const feedback = document.getElementById('practiceFeedback');
                 const currentTranslation = activePracticeWords[pIndex].translation;
 
                 playErrorSound();
@@ -1897,37 +1878,68 @@ document.addEventListener('click', () => {
 
                 if (attemptsLeft <= 0) {
                     practiceInput.disabled = true;
-                    const answerCard = document.createElement('div');
-                    answerCard.className = 'correct-answer-card';
-                    answerCard.textContent = currentTranslation;
-                    waitForPracticeKeyboardToClose().then(() => {
-                        practiceContainer.classList.add('answer-revealed');
-                        feedback.replaceChildren(answerCard);
-                        setTimeout(() => {
-                            feedback.innerHTML = `<img src="imgApp/gameOver.png" alt="Game Over" class="feedback-image large">`;
-                            playGameOverSound();
+                    const resultBody = document.getElementById('practiceResultBody');
+                    const resultModal = document.getElementById('practiceResultModal');
+                    const closeBtn = document.getElementById('practiceResultCloseBtn');
+                    if (resultBody) {
+                        resultBody.innerHTML = `
+                            <div style="font-size: 1.1rem; color: #94a3b8; margin-bottom: 8px;">Resposta Correta:</div>
+                            <div class="correct-answer-card">${currentTranslation}</div>
+                        `;
+                    }
+                    if (closeBtn) {
+                        closeBtn.disabled = true;
+                        closeBtn.style.display = 'none';
+                    }
+                    if (resultModal) {
+                        resultModal.classList.remove('hidden');
+                        resultModal.style.display = 'flex';
+                    }
 
-                            setTimeout(() => {
-                                practiceView.classList.add('hidden');
-                                if (practiceSource === 'detail') {
-                                    detailView.classList.remove('hidden');
-                                    renderWords();
-                                } else {
-                                    mainView.classList.remove('hidden');
-                                    renderNotebooks();
-                                }
-                            }, 4000);
-                        }, 4000);
-                    });
+                    failureResultTimeout = setTimeout(() => {
+                        if (resultBody) {
+                            resultBody.innerHTML = `<img src="imgApp/gameOver.png" alt="Game Over" class="feedback-image large">`;
+                        }
+                        playGameOverSound();
+                        if (closeBtn) {
+                            closeBtn.disabled = false;
+                            closeBtn.style.display = '';
+                        }
+                        failureResultTimeout = null;
+                    }, 4000);
+
+                    if (closeBtn) {
+                        closeBtn.onclick = () => {
+                            if (failureResultTimeout) {
+                                clearTimeout(failureResultTimeout);
+                                failureResultTimeout = null;
+                            }
+                            if (resultModal) {
+                                resultModal.classList.add('hidden');
+                                resultModal.style.display = 'none';
+                            }
+                            practiceView.classList.add('hidden');
+                            if (practiceSource === 'detail') {
+                                detailView.classList.remove('hidden');
+                                renderWords();
+                            } else {
+                                mainView.classList.remove('hidden');
+                                renderNotebooks();
+                            }
+                        };
+                    }
                 } else {
-                    feedback.textContent = '❌';
+                    const topFeedback = document.getElementById('practiceTopFeedback');
+                    if (topFeedback) {
+                        topFeedback.innerHTML = `<span style="font-size: 2.4rem; font-weight: bold; animation: popIn 0.2s ease;">❌</span>`;
+                    }
                     practiceInput.value = '';
                     practiceInput.style.height = 'auto';
                     resizePracticeInput();
                     practiceInput.focus();
 
                     setTimeout(() => {
-                        feedback.textContent = '';
+                        if (topFeedback) topFeedback.innerHTML = '';
                         isTransitioning = false;
                     }, 1200);
                 }
@@ -2000,23 +2012,29 @@ document.addEventListener('click', () => {
             function advance() {
                 pIndex++;
                 if (pIndex >= activePracticeWords.length) {
-                    const feedback = document.getElementById('practiceFeedback');
+                    const resultBody = document.getElementById('practiceResultBody');
+                    const resultModal = document.getElementById('practiceResultModal');
+                    const closeBtn = document.getElementById('practiceResultCloseBtn');
                     isTransitioning = true;
 
                     const percent = Math.round((correctAnswers / activePracticeWords.length) * 100);
 
                     if (percent === 100) {
-                        feedback.innerHTML = `<img src="imgApp/goodJob.png" alt="Excelente" class="feedback-image xl">`;
+                        resultBody.innerHTML = `<img src="imgApp/goodJob.png" alt="Excelente" class="feedback-image xl">`;
                         playLevelUpSound();
                     } else if (percent >= 50) {
-                        feedback.innerHTML = `${t('goodWork')}<div style="font-size: 3.0rem; color: #3b82f6; margin-top: 4px; font-family: monospace;">${t('score')}: ${percent}%<br>${t('practiceMore')}</div>`;
+                        resultBody.innerHTML = `${t('goodWork')}<div style="font-size: 3.0rem; color: #3b82f6; margin-top: 4px; font-family: monospace;">${t('score')}: ${percent}%<br>${t('practiceMore')}</div>`;
                         playCoinSound();
                     } else {
-                        feedback.innerHTML = `${t('trainingComplete')}<div style="font-size: 3.0rem; color: #94a3b8; margin-top: 4px; font-family: monospace;">${t('score')}: ${percent}%<br>${t('tryAgain')}</div>`;
+                        resultBody.innerHTML = `${t('trainingComplete')}<div style="font-size: 3.0rem; color: #94a3b8; margin-top: 4px; font-family: monospace;">${t('score')}: ${percent}%<br>${t('tryAgain')}</div>`;
                         playErrorSound();
                     }
 
-                    setTimeout(() => {
+                    resultModal.classList.remove('hidden');
+                    resultModal.style.display = 'flex';
+                    closeBtn.onclick = () => {
+                        resultModal.classList.add('hidden');
+                        resultModal.style.display = 'none';
                         practiceView.classList.add('hidden');
                         if (practiceSource === 'detail') {
                             detailView.classList.remove('hidden');
@@ -2025,14 +2043,13 @@ document.addEventListener('click', () => {
                             mainView.classList.remove('hidden');
                             renderNotebooks();
                         }
-                    }, 4000);
+                    };
                 } else {
                     nextStep();
                 }
             }
 
-            renderNotebooks();
-        });
+            renderNotebooks();        });
     </script>
 </body>
 </html>
