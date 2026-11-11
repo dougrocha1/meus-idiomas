@@ -582,6 +582,16 @@
         .keyboard-open #practiceAttempts {
             margin-bottom: 0;
         }
+        #practiceAttempts {
+            position: absolute;
+            top: 50%;
+            left: 4px;
+            transform: translateY(-50%);
+            flex-direction: column;
+            gap: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
         .keyboard-open #practiceQuitBtn {
             margin-top: 8px !important;
 
@@ -1746,18 +1756,20 @@ document.addEventListener('click', () => {
 
             function updateHeartsUI() {
                 const attemptsContainer = document.getElementById('practiceAttempts');
-                if (attemptsContainer) attemptsContainer.style.display = 'block';
-                let hearts = '';
+                if (attemptsContainer) attemptsContainer.style.display = 'flex';
+                const hearts = [];
                 const maxHearts = 3;
 
                 for (let i = 0; i < maxHearts; i++) {
                     if (i < attemptsLeft) {
-                        hearts += '❤️ ';
+                        hearts.push('❤️');
                     } else {
-                        hearts += '😢 ';
+                        hearts.push('😢');
                     }
                 }
-                attemptsContainer.innerHTML = `<span style="font-size: 1.35rem; letter-spacing: 1px;" >${hearts.trim()}</span>`;
+                attemptsContainer.innerHTML = hearts
+                    .map(heart => `<span style="font-size: 1.35rem; line-height: 1;">${heart}</span>`)
+                    .join('');
             }
 
             document.getElementById('detailPracticeBtn').onclick = () => {
