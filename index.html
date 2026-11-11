@@ -584,27 +584,39 @@
             margin-bottom: 0;
         }
         #practiceAttempts {
-            position: absolute;
-            top: calc(50% + 6px);
-            left: 4px;
-            transform: translateY(-50%);
-            flex-direction: column;
+            position: relative;
+            top: 6px;
+            left: auto;
+            transform: none;
+            display: flex;
+            flex-direction: row;
             justify-content: center;
-            gap: 7px;
+            gap: 5px;
+            white-space: nowrap;
             z-index: 1;
             pointer-events: none;
         }
         .practice-status-row {
-            position: relative;
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
             width: 100%;
             min-height: 72px;
             flex: 0 0 72px;
         }
+        #practiceAudioBtn {
+            position: relative !important;
+            left: auto !important;
+            transform: none !important;
+            justify-self: center;
+            z-index: 1;
+        }
         #practiceTopFeedback {
-            position: absolute;
-            top: 50%;
-            right: 4px;
-            transform: translateY(-50%);
+            position: relative;
+            top: auto;
+            right: auto;
+            transform: none;
+            justify-self: end;
         }
         .keyboard-open #practiceQuitBtn {
             margin-top: 8px !important;
