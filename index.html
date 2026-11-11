@@ -476,6 +476,11 @@
         .practice-result-modal.hidden {
             display: none !important;
         }
+        .practice-result-modal.keyboard-open {
+            top: var(--visual-viewport-offset-top, 0px);
+            bottom: auto;
+            height: var(--visual-viewport-height, 100vh);
+        }
         .practice-result-content {
             background: #0d1220;
             border: 3px solid #00ff55;
@@ -773,11 +778,11 @@
         <section id="practiceSection" class="hidden">
             <div class="practice-container">
                 <div class="practice-scroll-content">
-                    <div class="practice-word-wrapper" style="display:flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px;">
+                    <div class="practice-word-wrapper" style="display:flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; margin-bottom: 24px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-inline: 4px; position: relative;">
                             <p id="practiceAttempts" style="color: #f87171; font-weight: bold; margin: 0;"></p>
                             <button id="practiceAudioBtn" class="audio-btn" data-i18n-title="listenPronunciation" title="Ouvir pronúncia" style="padding: 10px; font-size: 1.2rem; position: absolute; left: 50%; transform: translateX(-50%);">🔊</button>
-                            <div id="practiceTopFeedback" style="width: 64px; height: 48px; display: flex; align-items: center; justify-content: flex-end;"></div>
+                            <div id="practiceTopFeedback" style="width: 64px; height: 64px; display: flex; align-items: flex-end; justify-content: flex-end; padding-bottom: 4px; box-sizing: border-box;"></div>
                         </div>
                         <h2 id="practiceNative" style="font-size: 1.8rem; color: #f9f9f9; text-align: center;"></h2>
                     </div>
@@ -1381,6 +1386,19 @@ document.addEventListener('click', () => {
             const modal = document.getElementById('modalOverlay');
             const practiceInput = document.getElementById('practiceInput');
             const practiceVisualViewport = window.visualViewport;
+            const practiceResultModal = document.getElementById('practiceResultModal');
+
+            function updateResultModalPosition() {
+                const keyboardOpen = practiceView.classList.contains('keyboard-open') && practiceVisualViewport;
+                practiceResultModal.classList.toggle('keyboard-open', Boolean(keyboardOpen));
+                if (keyboardOpen) {
+                    practiceResultModal.style.setProperty('--visual-viewport-height', `${practiceVisualViewport.height}px`);
+                    practiceResultModal.style.setProperty('--visual-viewport-offset-top', `${practiceVisualViewport.offsetTop}px`);
+                } else {
+                    practiceResultModal.style.removeProperty('--visual-viewport-height');
+                    practiceResultModal.style.removeProperty('--visual-viewport-offset-top');
+                }
+            }
 
             function updatePracticeKeyboardLayout() {
                 if (isTransitioning) return;
@@ -1390,6 +1408,7 @@ document.addEventListener('click', () => {
                     && practiceVisualViewport.height < window.innerHeight - 100;
 
                 practiceView.classList.toggle('keyboard-open', Boolean(keyboardOpen));
+                updateResultModalPosition();
                 if (keyboardOpen) {
                     appContainer?.classList.add('practice-animation-complete');
                     appContainer?.classList.add('practice-keyboard-layout');
@@ -1892,6 +1911,7 @@ document.addEventListener('click', () => {
                         closeBtn.style.display = 'none';
                     }
                     if (resultModal) {
+                        updateResultModalPosition();
                         resultModal.classList.remove('hidden');
                         resultModal.style.display = 'flex';
                     }
@@ -1916,6 +1936,7 @@ document.addEventListener('click', () => {
                             }
                             if (resultModal) {
                                 resultModal.classList.add('hidden');
+                                resultModal.classList.remove('keyboard-open');
                                 resultModal.style.display = 'none';
                             }
                             practiceView.classList.add('hidden');
@@ -2030,10 +2051,12 @@ document.addEventListener('click', () => {
                         playErrorSound();
                     }
 
+                    updateResultModalPosition();
                     resultModal.classList.remove('hidden');
                     resultModal.style.display = 'flex';
                     closeBtn.onclick = () => {
                         resultModal.classList.add('hidden');
+                        resultModal.classList.remove('keyboard-open');
                         resultModal.style.display = 'none';
                         practiceView.classList.add('hidden');
                         if (practiceSource === 'detail') {
